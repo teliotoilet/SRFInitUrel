@@ -1,0 +1,3 @@
+SRFInitUrel.C
+
+EXE = $(FOAM_APPBIN)/SRFInitUrel
