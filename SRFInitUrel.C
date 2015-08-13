@@ -38,10 +38,16 @@ Description
 
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 {
+    if (runTime.timeOutputValue() > 0) 
+    {
+        Info<< "Skipping time " << runTime.timeOutputValue() << " > 0" << endl;
+        return;
+    }
+
     IOobject Uheader
     (
         "Urel",
-        "0", //runTime.timeName(),
+        runTime.timeName(),
         mesh,
         IOobject::MUST_READ
     );
