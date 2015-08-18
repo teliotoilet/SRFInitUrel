@@ -57,7 +57,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
     if (Uheader.headerOk())
     {
         Info<< "    Reading Urel" << endl;
-        volVectorField Urel(Uheader, mesh);
+        volVectorField Urel(Uheader, mesh); // GeometricField<vector, fvPatchField, volMesh>
         vectorField& Uif = Urel.internalField();
 
         Info<< "    Creating SRF model\n" << endl;
@@ -95,7 +95,7 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
             if (!isA<wallFvPatch>(currPatch))
             {
                 Info<< "     - " << currPatch.name() << endl;
-                Urel.boundaryField()[patchI] = 
+                Urel.boundaryField()[patchI] == // need '==' to force assignment, e.g. with fixed patch
                     UInf - srf.velocity(mesh.Cf().boundaryField()[patchI]); // at face centers
             }
         }
