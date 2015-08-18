@@ -34,6 +34,8 @@ Description
 
 #include "SRFModel.H"
 
+#include "wallFvPatch.H" // to ID wall patches
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
@@ -83,6 +85,20 @@ void Foam::calc(const argList& args, const Time& runTime, const fvMesh& mesh)
 
         Info<< "    Calculating internal field" << endl;
         Uif = UInf - srf.velocity(Urel.mesh().C()); // evaluate SRF at cell centers
+
+        Info<< "    Calculating boundary fields" << endl;
+        const fvPatchList& patches = mesh.boundary();
+        forAll(patches, patchI)
+        {
+            const fvPatch& currPatch = patches[patchI];
+
+            if (!isA<wallFvPatch>(currPatch))
+            {
+                Info<< "     - " << currPatch.name() << endl;
+                Urel.boundaryField()[patchI] = 
+                    UInf - srf.velocity(mesh.Cf().boundaryField()[patchI]); // at face centers
+            }
+        }
 
         Info<< "    Writing Urel" << endl;
         Urel.write();
